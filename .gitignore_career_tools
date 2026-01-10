@@ -1,0 +1,40 @@
+# Career Tools - Files to Ignore in Version Control
+
+# Configuration files with sensitive data
+config.php
+
+# API Keys and Secrets
+.env
+.env.local
+*.key
+*.pem
+
+# Upload directories
+data/cv_uploads/*
+data/sop_uploads/*
+!data/cv_uploads/.gitkeep
+!data/sop_uploads/.gitkeep
+
+# Log files
+data/career_tools.log
+data/*.log
+*.log
+
+# Composer dependencies (if installed)
+vendor/
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
