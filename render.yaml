@@ -1,7 +1,6 @@
 services:
   - type: web
     name: chronuswebsite
-    runtime: php:8
     rootDir: .
     buildCommand: composer install --no-dev
     startCommand: php -S 0.0.0.0:10000 -t .
