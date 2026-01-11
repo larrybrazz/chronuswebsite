@@ -1,7 +1,7 @@
 services:
   - type: web
     name: chronuswebsite
-    env: php
+    runtime: php
     rootDir: .
     buildCommand: composer install --no-dev
     startCommand: php -S 0.0.0.0:10000 -t .
