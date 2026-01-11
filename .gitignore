@@ -1,0 +1,6 @@
+/vendor/
+/vendor/stripe/
+/data/*.sqlite
+/logs/
+/.env
+config.php
