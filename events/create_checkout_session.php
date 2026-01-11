@@ -1,4 +1,9 @@
 <?php
+// DEBUG: Show PHP errors to diagnose HTTP 500 locally
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Read and validate POST
 $eventId = isset($_POST['event_id']) ? (int)$_POST['event_id'] : null;
 $eventTitle = isset($_POST['event_title']) ? $_POST['event_title'] : 'Event';
@@ -7,12 +12,21 @@ $name = isset($_POST['name']) ? trim($_POST['name']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
 $notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
+$terms = isset($_POST['terms']) ? (int) $_POST['terms'] : 0;
 
 // Basic validation
 if (empty($name) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     header('Content-Type: application/json');
+    ob_clean();
     http_response_code(400);
     die(json_encode(['error' => 'Name and valid email are required.']));
+}
+
+if ($terms !== 1) {
+    header('Content-Type: application/json');
+    ob_clean();
+    http_response_code(400);
+    die(json_encode(['error' => 'You must agree to the terms.']));
 }
 
 // DB and mail helpers
@@ -35,7 +49,9 @@ $regId = insert_registration($pdo, [
 // Build success/cancel urls
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$baseUrl = $protocol . '://' . $host;
+// Allow subfolder deployments (e.g., /chronuswebsite-main)
+$appBasePath = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
+$baseUrl = $protocol . '://' . $host . ($appBasePath ? $appBasePath : '');
 
 try {
     if ($amount > 0) {
@@ -47,6 +63,9 @@ try {
         $keys = include __DIR__ . '/../inc/stripe.php';
         if (empty($keys['secret'])) {
             throw new Exception('STRIPE_SECRET_KEY not configured in environment');
+        }
+        if (!class_exists('Stripe\\Stripe')) {
+            throw new Exception('Stripe PHP library missing. Run: composer require stripe/stripe-php');
         }
         \Stripe\Stripe::setApiKey($keys['secret']);
         
@@ -77,21 +96,31 @@ try {
         // Update registration with session id
         update_registration($pdo, $regId, ['stripe_session_id' => $session->id]);
 
-        // Return JSON with Stripe URL
-        header('Content-Type: application/json');
-        die(json_encode(['redirect' => $session->url]));
+        // For form POST without JS, issue a redirect to Stripe-hosted checkout
+        ob_clean();
+        if (!$session->url) {
+            http_response_code(500);
+            die(json_encode(['error' => 'Stripe session created but no checkout URL returned.']));
+        }
+        error_log('Stripe checkout URL: ' . $session->url);
+        header('Location: ' . $session->url);
+        exit;
     } else {
         // Free event - registration already created with 'registered' status
         // send confirmation email (includes notes)
         send_registration_email($email, $name, $eventTitle, 'registered', $notes);
-        // Return JSON with redirect
-        header('Content-Type: application/json');
-        die(json_encode(['redirect' => $baseUrl . '/events/success.php?free=1&reg_id=' . $regId]));
+        // Redirect directly to success page
+        ob_clean();
+        header('Location: ' . $baseUrl . '/events/success.php?free=1&reg_id=' . $regId);
+        exit;
     }
-} catch (Exception $e) {
+} catch (Throwable $e) {
     // Rollback / mark registration as error
     update_registration($pdo, $regId, ['status' => 'error']);
-    header('Content-Type: application/json');
+    $errorMsg = $e->getMessage();
+    error_log('Stripe checkout error: ' . $errorMsg);
+    ob_clean();
     http_response_code(500);
-    die(json_encode(['error' => $e->getMessage()]));
+    header('Content-Type: text/html; charset=utf-8');
+    die('<html><body style="font-family: sans-serif; margin: 40px;"><h2>Payment Error</h2><p>' . htmlspecialchars($errorMsg) . '</p><p><a href="javascript:history.back()">Go Back</a></p></body></html>');
 }

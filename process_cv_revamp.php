@@ -435,7 +435,7 @@ function generateRevampedCV($cv_text, $target_job, $job_description) {
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are an expert resume writer specializing in ATS-optimized resumes. You MUST ONLY use facts from the provided resume. NEVER fabricate experience, skills, or achievements. Focus on reformatting, highlighting transferable skills, and using achievement-oriented language.'
+                    'content' => 'You are an HR Career Expert and Selection Panel Assessor. Rewrite resumes to align perfectly with the target job description. Use ONLY facts from the provided resume; never fabricate. Optimize for ATS with JD keywords, highlight measurable impact and leadership, and keep a human, natural tone that passes AI detection. Ensure clear ATS-friendly structure and formatting.'
                 ],
                 [
                     'role' => 'user',
@@ -464,33 +464,33 @@ function generateRevampedCV($cv_text, $target_job, $job_description) {
  */
 function buildRevampPrompt($cv_text, $target_job, $job_description) {
     $jd_section = !empty($job_description) 
-        ? "\n\nTarget Job Description:\n$job_description\n\nExtract ONLY the keywords and required skills from this job description."
+        ? "\n\nTarget Job Description (use for keywords/criteria):\n$job_description\n"
         : "";
     
     return <<<PROMPT
-Task: Revamp the following resume for a $target_job position. 
+Act as an HR Career Expert and Selection Panel Assessor. Rewrite the enclosed resume so it aligns perfectly with the $target_job role.
 
-CRITICAL RULES:
-1. USE ONLY FACTS FROM THE PROVIDED RESUME - Do NOT add any experience, skills, or achievements not present
-2. EXTRACT TRANSFERABLE SKILLS from existing experiences that align with the target role
-3. REFORMAT bullets to be achievement-oriented using the STAR method where possible
-4. OPTIMIZE for ATS (Applicant Tracking Systems) with proper keywords from the job description
-5. MAINTAIN a human, authentic voice - avoid robotic or templated language
-6. KEEP all dates, company names, and factual details EXACTLY as provided
-7. If experience is limited, HIGHLIGHT relevant coursework, projects, or volunteer work ONLY if they exist in the original
+Rules (non-negotiable):
+1) Fact-Based Only: use only information in the resume. No fabrication. If criteria are missing, surface transferable skills from real roles.
+2) ATS Compliance: weave in keywords/phrases from the job description naturally; ATS-friendly headings, bullets, and consistent formatting.
+3) High-Impact Presentation: position the candidate as a high-achieving corporate asset; emphasize measurable outcomes (KPI %, cost/time savings, efficiency gains, revenue/quality improvements, leadership impact).
+4) Alignment to Job Description: map experience and skills to essential/desirable criteria; emphasize relevant tech/skills/achievements; show adaptability via transferable skills where gaps exist.
+5) Humanized & Professional Tone: natural, authentic voice that passes AI detection; avoid robotic phrasing or generic buzzwords; clear and concise.
+6) Structure & Formatting (ATS-friendly):
+   - Header with name/contact
+   - Professional Summary (tailored, keyword-rich)
+   - Key Skills (aligned with JD)
+   - Work Experience (reverse chronological; quantified bullets with STAR-style results)
+   - Education & Certifications
+   - Optional: Projects, Awards, Technical Proficiencies (only if in source)
+7) Success Metrics: each role should include 2–3 quantified achievements (e.g., “Reduced resolution time by 35%”).
+8) Do not change dates/company names or add new roles.
 
-Original Resume:
+Original Resume (source of truth):
 $cv_text
 $jd_section
 
-Output Format:
-- Professional Summary (2-3 sentences highlighting relevant experience)
-- Core Competencies (bullet points of skills extracted from resume)
-- Professional Experience (reformatted with achievement-oriented bullets)
-- Education
-- Additional Sections (if relevant information exists in original)
-
-Remember: AUTHENTICITY over embellishment. Use ONLY what's provided.
+Output: A polished, ATS-optimized resume that aligns with the job description, highlights measurable impact, sounds human and professional, and positions the candidate as a top-tier applicant.
 PROMPT;
 }
 

@@ -72,7 +72,7 @@ if (count($parts) > 1) { $site_base = '/' . $parts[0] . '/'; }
                     <div class="card-body">
                         <h5 class="mb-3">Registration</h5>
                         <p class="mb-2">Price: <strong><?= ($event['price'] > 0) ? '£' . number_format($event['price'] / 100, 2) : '<span class="text-success">Free</span>'; ?></strong></p>
-                        <form id="regForm" action="create_checkout_session.php" method="post" novalidate>
+                        <form id="regForm" action="<?= htmlspecialchars($site_base) ?>events/create_checkout_session.php" method="post" novalidate>
                             <input type="hidden" name="event_id" value="<?= $idx ?>">
                             <input type="hidden" name="event_title" value="<?= htmlspecialchars($event['title']); ?>">
                             <input type="hidden" name="amount" value="<?= (int)$event['price']; ?>">
@@ -98,7 +98,7 @@ if (count($parts) > 1) { $site_base = '/' . $parts[0] . '/'; }
                             </div>
 
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" value="1" id="terms" required>
+                                <input class="form-check-input" type="checkbox" name="terms" value="1" id="terms" required>
                                 <label class="form-check-label small" for="terms">I agree to the terms and allow Chronus to contact me regarding this event.</label>
                             </div>
 
@@ -115,52 +115,7 @@ if (count($parts) > 1) { $site_base = '/' . $parts[0] . '/'; }
     </div>
 </section>
 
-<script>
-(function(){
-    var form = document.getElementById('regForm');
-    var btn = document.getElementById('submitBtn');
-    if (form && btn) {
-        form.addEventListener('submit', function(e){
-            e.preventDefault();
-            if (!form.checkValidity()) { form.reportValidity(); return; }
-            
-            btn.disabled = true;
-            var origText = btn.textContent;
-            btn.textContent = 'Processing...';
-            
-            var formData = new FormData(form);
-            fetch('create_checkout_session.php', { method: 'POST', body: formData })
-                .then(function(resp){ return resp.text(); })
-                .then(function(text){
-                    try {
-                        var data = JSON.parse(text);
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else if (data.error) {
-                            alert('Error: ' + data.error);
-                            btn.disabled = false;
-                            btn.textContent = origText;
-                        }
-                    } catch (e) {
-                        // Response is not JSON; assume redirect happened or server error
-                        if (text.includes('<') || text.includes('Error')) {
-                            alert('Server error. Please try again.');
-                        } else {
-                            window.location.href = 'create_checkout_session.php';
-                        }
-                        btn.disabled = false;
-                        btn.textContent = origText;
-                    }
-                })
-                .catch(function(e){
-                    alert('Network error: ' + e.message);
-                    btn.disabled = false;
-                    btn.textContent = origText;
-                });
-        });
-    }
-})();
-</script>
+
 
 				<!-- End Events Area -->
 

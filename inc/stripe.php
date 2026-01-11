@@ -1,6 +1,14 @@
 <?php
-// Stripe helper - returns keys
-// Set STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY in environment variables or define them in a non-committed file.
-$secret = getenv('STRIPE_SECRET_KEY') ?: (defined('STRIPE_SECRET_KEY') ? STRIPE_SECRET_KEY : null);
-$publishable = getenv('STRIPE_PUBLISHABLE_KEY') ?: (defined('STRIPE_PUBLISHABLE_KEY') ? STRIPE_PUBLISHABLE_KEY : null);
+// Stripe helper - returns keys from environment variables
+// Set these in your system or .env file (not committed to git)
+
+$secret = getenv('STRIPE_SECRET_KEY');
+$publishable = getenv('STRIPE_PUBLISHABLE_KEY');
+
+// For local development: add your test keys to Windows environment variables
+// Or create a .env file and load it with vlucas/phpdotenv
+if (!$secret || !$publishable) {
+    throw new Exception('Stripe API keys not configured. Set STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY environment variables.');
+}
+
 return ['secret' => $secret, 'publishable' => $publishable];

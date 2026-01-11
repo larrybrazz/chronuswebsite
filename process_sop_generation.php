@@ -271,7 +271,7 @@ function generateSOP($cv_text, $program_name, $institution_name, $job_descriptio
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are an expert statement of purpose writer. You MUST create authentic, personalized SOPs using ONLY the facts provided from the CV and user input. NEVER fabricate experiences or achievements. Demonstrate alignment with organization core values and success profile. Focus on extracting transferable skills and creating a compelling narrative from real experiences.'
+                    'content' => 'Act as a Human Resource Career Expert. Create a polished, human supporting statement that meets the job criteria, uses only factual achievements from the CV and user inputs, integrates ATS-relevant keywords, highlights measurable impact and leadership, and mirrors the organization’s tone for supporting statements. Avoid robotic or AI-like phrasing and never fabricate content.'
                 ],
                 [
                     'role' => 'user',
@@ -300,48 +300,40 @@ function generateSOP($cv_text, $program_name, $institution_name, $job_descriptio
  */
 function buildSOPPrompt($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation) {
     return <<<PROMPT
-Task: Write a compelling Statement of Purpose for a $program_name application/role at $institution_name.
+Act as a Human Resource Career Expert and craft a compelling supporting statement for a $program_name application/role at $institution_name.
 
-CRITICAL RULES:
-1. USE ONLY FACTS from the provided CV and user inputs - NO fabrication
-2. EXTRACT TRANSFERABLE SKILLS from actual experiences that align with the role requirements
-3. DEMONSTRATE ALIGNMENT with the organization's core values through real examples
-4. MAP YOUR EXPERIENCES to the success profile - show how you fit the competency model
-5. CREATE AN AUTHENTIC NARRATIVE that connects past experiences to future goals
-6. MAINTAIN a genuine, human voice - avoid clichés and generic statements
-7. STRUCTURE the SOP logically: Introduction → Background/Experience → Values Alignment → Success Profile Fit → Why This Program/Role → Career Goals → Conclusion
-8. If experience is limited, focus on REAL projects, coursework, or personal initiatives mentioned in CV
+Non-negotiable rules:
+1) Meet the stated criteria for the position using the job description as the guide.
+2) Be fact-based: use only real achievements/responsibilities from the CV and user inputs. No fabrication.
+3) Sound human and natural; avoid robotic or AI-like phrasing to pass AI detection.
+4) Include key ATS keywords/phrases relevant to the role and industry.
+5) Position the candidate as a high-achieving corporate asset, emphasizing measurable impact and leadership.
+6) Integrate specific examples with success metrics (cost savings, efficiency gains, team leadership, project delivery, revenue/quality improvements).
+7) Follow the organization’s standard tone/format for supporting statements; be engaging, authentic, and professional.
+8) Highlight transferable skills and future value to the company.
 
-Applicant's CV:
+Applicant's CV (source of facts):
 $cv_text
 
-Job/Program Description:
+Job/Program Description (criteria/keywords):
 $job_description
 
-Organization Core Values:
+Organization Core Values (tone and proof points):
 $core_values
 
-Success Profile for this Role:
+Success Profile for this Role (competency focus):
 $success_profile
 
-Career Goals (provided by applicant):
+Career Goals (candidate):
 $career_goals
 
-Motivation for this program/role (provided by applicant):
+Motivation for this program/role (candidate):
 $motivation
 
 Target Program/Position: $program_name
 Institution/Company: $institution_name
 
-Output Requirements:
-- Length: 600-800 words
-- Tone: Professional yet personal, authentic
-- Structure: Clear paragraphs with logical flow
-- Focus: How REAL experiences align with job requirements, core values, and success profile
-- Demonstrate: Specific examples showing values alignment and success profile fit
-- Avoid: Generic statements, clichés, fabricated achievements
-
-Write the Statement of Purpose demonstrating clear alignment with the role requirements, organizational values, and success profile:
+Output: A polished, humanized supporting statement that aligns with the job requirements, showcases strengths and achievements with metrics, and reads like it was written by the candidate (not AI).
 PROMPT;
 }
 
