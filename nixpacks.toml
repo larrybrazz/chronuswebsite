@@ -4,5 +4,8 @@ nixPkgs = ["php82", "php82Packages.composer"]
 [phases.install]
 cmds = ["composer install --no-dev --optimize-autoloader"]
 
+[build]
+cmds = ["echo 'Build complete'"]
+
 [start]
-cmd = "bash start.sh"
+cmd = "php -S 0.0.0.0:${PORT:-8080} router.php"
