@@ -14,6 +14,7 @@ class ComposerStaticInit1ba944b1b2880695113851e981334169
         'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Stripe\\' => 7,
         ),
     );
 
@@ -21,6 +22,10 @@ class ComposerStaticInit1ba944b1b2880695113851e981334169
         'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Stripe\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
         ),
     );
 
