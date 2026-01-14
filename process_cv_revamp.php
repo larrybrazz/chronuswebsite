@@ -483,14 +483,64 @@ Rules (non-negotiable):
    - Work Experience (reverse chronological; quantified bullets with STAR-style results)
    - Education & Certifications
    - Optional: Projects, Awards, Technical Proficiencies (only if in source)
-7) Success Metrics: each role should include 2–3 quantified achievements (e.g., “Reduced resolution time by 35%”).
+7) Success Metrics: each role should include 6–8 achievement-focused bullet points with quantified achievements (e.g., "Reduced resolution time by 35%").
 8) Do not change dates/company names or add new roles.
+
+OUTPUT FORMAT REQUIREMENTS:
+- Return ONLY the revamped CV content, no explanations or commentary
+- Use this exact structure: Professional Summary (3-4 lines), Core Competencies (bullet points), Professional Experience (reverse chronological), Education, Certifications (if applicable)
+- Start each bullet with strong action verb (Led, Delivered, Implemented, etc.)
+- Include metrics in at least 70% of bullets
+- Do NOT add generic skills claims without proof
+
+LENGTH REQUIREMENTS:
+- Target: 2 pages maximum for 5-10 years experience; 1.5-2 pages for 3-5 years experience
+- If CV is too long: consolidate older/less relevant roles
+- If CV is too short: expand recent roles with more detail on impact
+- Professional summary: maximum 4 lines
+
+KEYWORD INTEGRATION:
+- Extract specific skills/tools from job description
+- Integrate keywords ONLY where genuinely applicable to their experience
+- Never fabricate experience to include keywords
+- Prioritize keywords that appear in BOTH job description and original CV
+- Place critical keywords in: Professional Summary, Core Competencies, and relevant role descriptions
+- Avoid: keyword stuffing, unnatural phrasing, claiming skills not demonstrated
+
+HANDLING GAPS:
+- If job description is missing/vague: optimize for general industry roles
+- If CV lacks quantified achievements: infer reasonable impact from tasks described (e.g., "Managed stakeholder meetings" → "Facilitated weekly stakeholder alignment sessions across 5 departments, improving project visibility")
+- If specific tools mentioned but no context: add brief context without fabricating
+- If dates/companies unclear: flag this in output for user to clarify
+
+ATS OPTIMIZATION:
+- Use standard section headers: "Professional Experience" not "Where I've Worked"
+- Avoid tables, text boxes, headers/footers, graphics
+- Use simple bullet points (•) not custom symbols
+- Spell out acronyms on first use, then use acronym: "Business Analysis (BA)"
+- Date format: Month Year - Month Year (e.g., "Jan 2018 - Dec 2022")
+- No pronouns (I, me, my) in bullet points
+
+FINAL VERIFICATION CHECKLIST (AI must self-check before outputting):
+☐ Every quantified metric from original CV is present (£, %, timeframes)
+☐ All specific tool/technology names preserved
+☐ No bullet point is more generic than original
+☐ At least 70% of bullets include quantified results
+☐ Each role shows progression/increasing responsibility
+☐ Professional summary mentions target role and top 3 value propositions
+☐ No fabricated achievements or exaggerated claims
+☐ Tone is confident but credible
+
+ERROR HANDLING:
+- If CV quality is extremely poor: Flag "This CV needs significant strengthening beyond formatting" and still attempt revamp with note "Recommend adding specific metrics and results"
+- If CV is not in English: Return error "Please provide CV in English"
+- If job description contradicts CV experience level: Flag mismatch but optimize for job description requirements
 
 Original Resume (source of truth):
 $cv_text
 $jd_section
 
-Output: A polished, ATS-optimized resume that aligns with the job description, highlights measurable impact, sounds human and professional, and positions the candidate as a top-tier applicant.
+Output: A polished, ATS-optimized resume that aligns with the job description, highlights measurable impact, sounds human and professional, and positions the candidate as a top-tier applicant. Return ONLY the CV content with no additional commentary.
 PROMPT;
 }
 
