@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Validate required fields
-if (empty($_FILES['cv_file']) || empty($_POST['program_name']) || empty($_POST['institution_name']) || empty($_POST['career_goals']) || empty($_POST['motivation']) || empty($_POST['email'])) {
+if (empty($_FILES['cv_file']) || empty($_POST['program_name']) || empty($_POST['institution_name']) || empty($_POST['motivation']) || empty($_POST['email'])) {
     json_error('Please fill in all required fields');
 }
 
@@ -146,12 +146,13 @@ $program_name = htmlspecialchars(trim($_POST['program_name']));
 $institution_name = htmlspecialchars(trim($_POST['institution_name']));
 $job_description = htmlspecialchars(trim($_POST['job_description']));
 $core_values = htmlspecialchars(trim($_POST['core_values']));
-$success_profile = htmlspecialchars(trim($_POST['success_profile']));
-$career_goals = htmlspecialchars(trim($_POST['career_goals']));
+$success_profile = !empty($_POST['success_profile']) ? htmlspecialchars(trim($_POST['success_profile'])) : '';
 $motivation = htmlspecialchars(trim($_POST['motivation']));
+$word_count = !empty($_POST['word_count']) ? intval($_POST['word_count']) : 750;
+$word_count = max(250, min(2000, $word_count)); // Clamp between 250-2000
 
 // Generate SOP using AI
-$sop = generateSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation);
+$sop = generateSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count);
 
 if (!$sop) {
     json_error('Failed to generate Statement of Purpose. Please try again.');
@@ -174,7 +175,7 @@ $metadata = [
     'email' => $email,
     'program_name' => $program_name,
     'institution_name' => $institution_name,
-    'career_goals' => $career_goals,
+    'word_count' => $word_count,
     'motivation' => $motivation,
     'original_cv' => $cv_file['name'],
     'timestamp' => date('Y-m-d H:i:s'),
@@ -240,23 +241,23 @@ function extractTextFromCV($filepath, $extension) {
 /**
  * Generate SOP using AI with strict constraints
  */
-function generateSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation) {
+function generateSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count) {
     // AI API configuration
     $api_key = defined('OPENAI_API_KEY') ? OPENAI_API_KEY : getenv('OPENAI_API_KEY');
     $use_ai = defined('ENABLE_AI_PROCESSING') ? ENABLE_AI_PROCESSING : true;
     
     if (!$use_ai || empty($api_key) || $api_key === 'your-api-key-here') {
-        return ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation);
+        return ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count);
     }
     
     // Build strict prompt
-    $prompt = buildSOPPrompt($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation);
+    $prompt = buildSOPPrompt($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count);
     
     // Call AI API
     $api_endpoint = defined('OPENAI_ENDPOINT') ? OPENAI_ENDPOINT : 'https://api.openai.com/v1/chat/completions';
     $model = defined('OPENAI_MODEL') ? OPENAI_MODEL : 'gpt-4';
     $temperature = defined('SOP_TEMPERATURE') ? SOP_TEMPERATURE : 0.4;
-    $max_tokens = defined('SOP_MAX_TOKENS') ? SOP_MAX_TOKENS : 1500;
+    $max_tokens = intval($word_count * 1.3); // Allow 30% margin for token count
     
     $ch = curl_init($api_endpoint);
     curl_setopt_array($ch, [
@@ -271,7 +272,7 @@ function generateSOP($cv_text, $program_name, $institution_name, $job_descriptio
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'Act as a Human Resource Career Expert. Create a polished, human supporting statement that meets the job criteria, uses only factual achievements from the CV and user inputs, integrates ATS-relevant keywords, highlights measurable impact and leadership, and mirrors the organization’s tone for supporting statements. Avoid robotic or AI-like phrasing and never fabricate content.'
+                    'content' => 'Act as a Human Resource Career Expert. Create a polished, human supporting statement that meets the job criteria, uses only factual achievements from the CV and user inputs, integrates ATS-relevant keywords, highlights measurable impact and leadership, and mirrors the organization\'s tone for supporting statements. Avoid robotic or AI-like phrasing and never fabricate content. Use clear single-line headings (no numbers or "NO." prefixes). Aim for exactly ' . $word_count . ' words.'
                 ],
                 [
                     'role' => 'user',
@@ -288,7 +289,7 @@ function generateSOP($cv_text, $program_name, $institution_name, $job_descriptio
     curl_close($ch);
     
     if ($http_code !== 200) {
-        return ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation);
+        return ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count);
     }
     
     $data = json_decode($response, true);
@@ -298,7 +299,8 @@ function generateSOP($cv_text, $program_name, $institution_name, $job_descriptio
 /**
  * Build AI prompt for SOP generation with strict constraints
  */
-function buildSOPPrompt($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation) {
+function buildSOPPrompt($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count) {
+    $success_note = !empty($success_profile) ? "Success Profile for this Role (competency focus):\n$success_profile\n\n" : '';
     return <<<PROMPT
 Act as a Human Resource Career Expert and craft a compelling supporting statement for a $program_name application/role at $institution_name.
 
@@ -311,6 +313,8 @@ Non-negotiable rules:
 6) Integrate specific examples with success metrics (cost savings, efficiency gains, team leadership, project delivery, revenue/quality improvements).
 7) Follow the organization’s standard tone/format for supporting statements; be engaging, authentic, and professional.
 8) Highlight transferable skills and future value to the company.
+9) Use clear single-line headings with no numbers or "NO." prefixes. Example: "Introduction" not "NO. 1 Introduction"
+10) Aim for exactly $word_count words (±5% tolerance).
 
 Applicant's CV (source of facts):
 $cv_text
@@ -321,26 +325,20 @@ $job_description
 Organization Core Values (tone and proof points):
 $core_values
 
-Success Profile for this Role (competency focus):
-$success_profile
-
-Career Goals (candidate):
-$career_goals
-
-Motivation for this program/role (candidate):
+{$success_note}Motivation for this program/role (candidate):
 $motivation
 
 Target Program/Position: $program_name
 Institution/Company: $institution_name
 
-Output: A polished, humanized supporting statement that aligns with the job requirements, showcases strengths and achievements with metrics, and reads like it was written by the candidate (not AI).
+Output: A polished, humanized supporting statement (~$word_count words) that aligns with the job requirements, showcases strengths and achievements with metrics, reads like it was written by the candidate (not AI), and uses only single-line headings without numbering.
 PROMPT;
 }
 
 /**
  * Rule-based SOP generation (fallback)
  */
-function ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $career_goals, $motivation) {
+function ruleBasedSOP($cv_text, $program_name, $institution_name, $job_description, $core_values, $success_profile, $motivation, $word_count) {
     // Extract detailed information from CV
     $skills = extractDetailedSkills($cv_text);
     $experience_bullets = extractDetailedExperience($cv_text);
@@ -409,13 +407,6 @@ function ruleBasedSOP($cv_text, $program_name, $institution_name, $job_descripti
         }
     }
     $sop .= "\n";
-    
-    // ===== CAREER GOALS & PROFESSIONAL DEVELOPMENT =====
-    $sop .= "CAREER GOALS & PROFESSIONAL DEVELOPMENT\n\n";
-    $sop .= "This opportunity is a strategic step in my professional journey. " . 
-            trim($career_goals) . " ";
-    $sop .= "The " . $program_name . " role at " . $institution_name . " will enable me to develop these skills ";
-    $sop .= "while contributing to meaningful work.\n\n";
     
     // ===== CONCLUSION: ENTHUSIASM & READINESS =====
     $sop .= "CONCLUSION\n\n";

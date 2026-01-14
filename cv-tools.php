@@ -40,26 +40,18 @@
                     </div>
 
                     <form id="cvRevampForm" enctype="multipart/form-data" style="display: block;">
-                        <!-- File Upload or Text Paste Toggle -->
-                        <div style="margin-bottom: 20px; text-align: center;">
-                            <div style="display: inline-flex; background: #f0f0f0; border-radius: 6px; padding: 3px;">
-                                <button type="button" onclick="toggleCVInput('file')" id="fileBtn" style="padding: 8px 20px; border: none; background: #9acd32; color: white; border-radius: 4px; cursor: pointer; font-weight: 600;">Upload File</button>
-                                <button type="button" onclick="toggleCVInput('text')" id="textBtn" style="padding: 8px 20px; border: none; background: transparent; color: #666; border-radius: 4px; cursor: pointer; font-weight: 600;">Paste Text</button>
-                            </div>
-                        </div>
-
                         <!-- File Upload Option -->
                         <div id="fileUploadSection" style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Upload Your Current CV</label>
-                            <input type="file" name="current_cv" id="cvFile" accept=".pdf,.doc,.docx" style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: white; color: #333; box-sizing: border-box;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Upload Your Current CV *</label>
+                            <input type="file" name="current_cv" id="cvFile" accept=".pdf,.doc,.docx" required style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: white; color: #333; box-sizing: border-box;">
                             <small style="display: block; margin-top: 5px; color: #999;">Supported formats: PDF, DOC, DOCX</small>
                         </div>
 
                         <!-- Text Paste Option -->
-                        <div id="textPasteSection" style="margin-bottom: 25px; display: none;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Paste Your CV Text</label>
-                            <textarea name="cv_text" id="cvText" placeholder="Paste your complete CV text here (copy from your PDF or Word document)..." style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 200px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
-                            <small style="display: block; margin-top: 5px; color: #28a745;">✓ Best option for scanned PDFs or image-based documents</small>
+                        <div id="textPasteSection" style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Or Paste Your CV Text (Optional)</label>
+                            <textarea name="cv_text" id="cvText" placeholder="Paste your complete CV text here if you prefer not to upload a file..." style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 200px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
+                            <small style="display: block; margin-top: 5px; color: #999;">Leave empty if uploading file above. Best for scanned PDFs or image-based documents.</small>
                         </div>
 
                         <div style="margin-bottom: 25px;">
@@ -135,19 +127,20 @@
                         </div>
 
                         <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Success Profile for the Role *</label>
-                            <textarea name="success_profile" placeholder="Describe what success looks like in this role (key competencies, achievements, behaviors)..." required style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 100px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Success Profile for the Role (Optional)</label>
+                            <textarea name="success_profile" placeholder="Describe what success looks like in this role (key competencies, achievements, behaviors)..." style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 100px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
                             <small style="display: block; margin-top: 5px; color: #999;">What traits, skills, and outcomes define top performers?</small>
-                        </div>
-
-                        <div style="margin-bottom: 25px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Your Career Goals *</label>
-                            <textarea name="career_goals" placeholder="Describe your short-term and long-term career aspirations..." required style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 100px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
                         </div>
 
                         <div style="margin-bottom: 25px;">
                             <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Why This Program/Role? *</label>
                             <textarea name="motivation" placeholder="What attracts you to this specific opportunity?" required style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; min-height: 100px; background: white; color: #333; box-sizing: border-box; resize: vertical;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">Target Word Count *</label>
+                            <input type="number" name="word_count" min="250" max="2000" value="750" required style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: white; color: #333; box-sizing: border-box;">
+                            <small style="display: block; margin-top: 5px; color: #999;">SOP will aim for this word count (250-2000 words)</small>
                         </div>
 
                         <div style="margin-bottom: 25px;">
