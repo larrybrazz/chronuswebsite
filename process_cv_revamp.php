@@ -470,21 +470,69 @@ function buildRevampPrompt($cv_text, $target_job, $job_description) {
     return <<<PROMPT
 Act as an HR Career Expert and Selection Panel Assessor. Rewrite the enclosed resume so it aligns perfectly with the $target_job role.
 
-Rules (non-negotiable):
-1) Fact-Based Only: use only information in the resume. No fabrication. If criteria are missing, surface transferable skills from real roles.
-2) ATS Compliance: weave in keywords/phrases from the job description naturally; ATS-friendly headings, bullets, and consistent formatting.
-3) High-Impact Presentation: position the candidate as a high-achieving corporate asset; emphasize measurable outcomes (KPI %, cost/time savings, efficiency gains, revenue/quality improvements, leadership impact).
+CORE RULES (NON-NEGOTIABLE):
+1) Fact-Based Only: use ONLY information in the resume. No fabrication. If criteria are missing, surface transferable skills from real roles.
+2) ATS Compliance: weave in keywords/phrases from the job description naturally; use ATS-friendly headings, bullets, and consistent formatting.
+3) High-Impact Presentation: position candidate as high-achieving corporate asset; emphasize measurable outcomes (KPI %, cost/time savings, efficiency gains, revenue/quality improvements, leadership impact).
 4) Alignment to Job Description: map experience and skills to essential/desirable criteria; emphasize relevant tech/skills/achievements; show adaptability via transferable skills where gaps exist.
 5) Humanized & Professional Tone: natural, authentic voice that passes AI detection; avoid robotic phrasing or generic buzzwords; clear and concise.
-6) Structure & Formatting (ATS-friendly):
-   - Header with name/contact
-   - Professional Summary (tailored, keyword-rich)
-   - Key Skills (aligned with JD)
-   - Work Experience (reverse chronological; quantified bullets with STAR-style results)
-   - Education & Certifications
-   - Optional: Projects, Awards, Technical Proficiencies (only if in source)
-7) Success Metrics: each role should include 6–8 achievement-focused bullet points with quantified achievements (e.g., "Reduced resolution time by 35%").
-8) Do not change dates/company names or add new roles.
+6) Do NOT change dates/company names or add new roles.
+
+LENGTH REQUIREMENTS:
+- Target: 2 pages maximum for roles with 5-10 years experience
+- Target: 1.5-2 pages for roles with 3-5 years experience
+- If CV is currently too long: consolidate older/less relevant roles
+- If CV is currently too short: expand recent roles with more detail on impact
+- Professional summary: maximum 4 lines
+
+KEYWORD INTEGRATION RULES:
+- Extract specific skills/tools from job description
+- Integrate keywords ONLY where genuinely applicable to their experience
+- Never fabricate experience to include keywords
+- Prioritize keywords that appear in BOTH job description and original CV
+- Place critical keywords in: Professional Summary, Core Competencies, and relevant role descriptions
+- Avoid: keyword stuffing, unnatural phrasing, claiming skills not demonstrated
+
+HANDLING GAPS & MISSING INFO:
+- If job description is missing/vague: optimize for general industry roles
+- If CV lacks quantified achievements: infer reasonable impact from tasks described
+  Example: "Managed stakeholder meetings" → "Facilitated weekly stakeholder alignment sessions across 5 departments, improving project visibility and decision-making speed"
+- If specific tools mentioned but no context: add brief context without fabricating
+- If dates/companies unclear: flag this in output for user to clarify
+
+ATS OPTIMIZATION STANDARDS:
+- Use standard section headers: "Professional Experience" not "Where I've Worked"
+- Avoid tables, text boxes, headers/footers, graphics
+- Use simple bullet points (•) not custom symbols
+- Spell out acronyms on first use, then use acronym: "Business Analysis (BA)"
+- Include both spelled-out and acronym versions of key skills
+- Date format: Month Year - Month Year (e.g., "Jan 2018 - Dec 2022")
+- No pronouns (I, me, my) in bullet points
+- Each role must have 6-8 achievement-focused bullet points
+- Start each bullet with strong action verb (Led, Delivered, Implemented, Transformed, etc.)
+- Include metrics in at least 70% of bullets
+
+FINAL VERIFICATION CHECKLIST (AI must self-check before outputting):
+☐ Every quantified metric from original CV is present (£, %, timeframes)
+☐ All specific tool/technology names preserved
+☐ No bullet point is more generic than original
+☐ At least 70% of bullets include quantified results
+☐ Each role shows progression/increasing responsibility
+☐ Professional summary mentions target role and top 3 value propositions
+☐ No fabricated achievements or exaggerated claims
+☐ Tone is confident but credible
+
+ERROR HANDLING GUIDELINES:
+If CV quality is extremely poor (no achievements, all generic tasks):
+1. Flag this to user: "This CV needs significant strengthening beyond formatting"
+2. Still attempt revamp but note: "Recommend adding specific metrics and results"
+3. Suggest what information is missing
+
+If CV is not in English:
+- Return error: "Please provide CV in English"
+
+If job description contradicts CV experience level:
+- Flag mismatch but optimize for job description requirements
 
 OUTPUT FORMAT REQUIREMENTS:
 - Return ONLY the revamped CV content, no explanations or commentary
