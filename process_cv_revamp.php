@@ -372,8 +372,8 @@ function cleanExtractedText($text) {
     $text = preg_replace('/stream\s*/', '', $text);
     
     // Remove PDF dictionary markers
-    $text = preg_replace('/<</[^>]*>>/s', '', $text);
-    $text = preg_replace('/<<|>>/', '', $text);
+    $text = preg_replace('/<</s', '', $text);
+    $text = preg_replace('/>>/s', '', $text);
     
     // Remove PDF operators and references
     $text = preg_replace('/\/[A-Z][a-zA-Z0-9]*/', '', $text);
